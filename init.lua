@@ -18,4 +18,4 @@ require('plugins.lualine')
 require('plugins.whichkey')
 require('plugins.comment')
 require('plugins.toggleterm')
-
+require('plugins.code_runner')

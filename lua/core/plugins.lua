@@ -45,6 +45,7 @@ require("lazy").setup({
     }},
     {'folke/which-key.nvim'},
         {'terrortylor/nvim-comment'},
-    {'akinsho/toggleterm.nvim'}
+    {'akinsho/toggleterm.nvim'},
+    {'CRAG666/code_runner.nvim'},
   },
 })

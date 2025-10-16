@@ -36,3 +36,11 @@ vim.keymap.set('n', '<leader>s', ':BufferLineSortByTabs<CR>')
 vim.keymap.set('n', '<leader>tf', ':ToggleTerm direction=float<CR>')
 vim.keymap.set('n', '<leader>th', ':ToggleTerm direction=horizontal<CR>')
 vim.keymap.set('n', '<leader>tv', ':ToggleTerm direction=vertical size=40<CR>')
+
+-- Code runner
+vim.keymap.set('n', '<leader>rr', ':RunCode<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rf', ':RunFile<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rft', ':RunFile tab<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rp', ':RunProject<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rc', ':RunClose<CR>', { noremap = true, silent = false })
+
