@@ -67,10 +67,13 @@ wk.add({
         {"jj", "<Esc>", desc = "Escape insert mode" }
     },
     -- Code runner
-    {"<leader>r", group = "r"},
+    {"<leader>r", group = "runner"},
     {"<Leader>rr", "<cmd>RunCode<cr>", desc = "Run code"},
-    {"<Leader>rf", group = "rf", "<cmd>RunFile<cr>", desc = "Run file"},
+    {"<Leader>rf", group = "run file", "<cmd>RunFile<cr>", desc = "Run file"},
     {"<Leader>rft", "<cmd>RunFile tab<cr>", desc = "Run file tab"},
     {"<Leader>rp", "<cmd>RunProject<cr>", desc = "Run project"},
     {"<Leader>rc", "<cmd>RunClose<cr>", desc = "Run close"},
+
+    -- Image paste
+    {"<leader>p", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard"}
 })

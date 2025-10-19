@@ -1,9 +1,4 @@
-vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
-vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
-vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
-vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
-
--- Настройка отображения диагностики
+-- ОБЩИЕ НАСТРОЙКИ LSP
 vim.diagnostic.config({
   virtual_text = {
     source = "if_many",
@@ -11,7 +6,14 @@ vim.diagnostic.config({
     spacing = 4,
     severity = { min = vim.diagnostic.severity.WARN },
   },
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '',
+      [vim.diagnostic.severity.WARN] = '',
+      [vim.diagnostic.severity.HINT] = '',
+      [vim.diagnostic.severity.INFO] = '',
+    }
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
@@ -39,24 +41,22 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format, bufopts)
 end
 
--- Функция для получения filetypes по серверу
-local function get_filetypes(server)
-  local filetype_map = {
-    lua_ls = {'lua'},
-    pyright = {'python'},
-    clangd = {'c', 'cpp'},
-    kotlin_language_server = {'kotlin'},
-    html = {'html'},
-    cssls = {'css'},
-    jsonls = {'json'},
+-- ПРОСТОЙ СПОСОБ: настройка через vim.lsp.start с явным указанием cmd
+local function setup_lsp(server, filetypes, extra_config)
+  -- Базовые команды для серверов
+  local server_cmds = {
+    lua_ls = { "lua-language-server" },
+    pyright = { "pyright-langserver", "--stdio" },
+    clangd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=never" },
+    kotlin_language_server = { "kotlin-language-server" },
+    html = { "vscode-html-language-server", "--stdio" },
+    cssls = { "vscode-css-language-server", "--stdio" },
+    jsonls = { "vscode-json-language-server", "--stdio" },
   }
-  return filetype_map[server] or {server}
-end
-
--- Используем vim.lsp.start
-local function setup_lsp(server, extra_config)
+  
   local config = {
     name = server,
+    cmd = server_cmds[server],
     capabilities = capabilities,
     on_attach = on_attach,
   }
@@ -67,58 +67,46 @@ local function setup_lsp(server, extra_config)
     end
   end
   
-  -- Автозапуск LSP при открытии соответствующих файлов
   vim.api.nvim_create_autocmd('FileType', {
-    pattern = get_filetypes(server),
+    pattern = filetypes,
     callback = function()
       vim.lsp.start(config)
     end,
   })
 end
 
--- НАСТРОЙКА lua_ls
-setup_lsp('lua_ls', {
+-- Настройка серверов
+setup_lsp('lua_ls', {'lua'}, {
   settings = {
     Lua = {
       runtime = { version = 'LuaJIT' },
-      diagnostics = { 
-        globals = {'vim'}
-      },
-      workspace = {
+      diagnostics = { globals = { 'vim' } },
+      workspace = { 
         library = vim.api.nvim_get_runtime_file("", true),
-        checkThirdParty = false
+        checkThirdParty = false 
       },
       telemetry = { enable = false },
-      completion = {
-        callSnippet = "Replace"
-      }
     }
   }
 })
 
--- Настройки для других серверов
-setup_lsp('pyright', {
+setup_lsp('pyright', {'python'}, {
   settings = {
     python = {
       analysis = {
         typeCheckingMode = "basic",
         autoSearchPaths = true,
-        useLibraryCodeForTypes = true
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "workspace",
       }
     }
   }
 })
 
-setup_lsp('clangd', {
-  cmd = {
-    "clangd",
-    "--background-index",
-    "--clang-tidy",
-    "--header-insertion=never",
-  }
-})
+setup_lsp('clangd', {'c', 'cpp'})
+setup_lsp('kotlin_language_server', {'kotlin'})
+setup_lsp('html', {'html'})
+setup_lsp('cssls', {'css'})
+setup_lsp('jsonls', {'json'})
 
-setup_lsp('kotlin_language_server')
-setup_lsp('html')
-setup_lsp('cssls')
-setup_lsp('jsonls')
+
